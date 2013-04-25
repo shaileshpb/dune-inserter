@@ -10,7 +10,7 @@ class Inserter
     int slotsize;
     map<pair<int,int>,int> spare;
     T *matrix;
-    bool isupdate=update;//for update_plus operations
+    bool isupdate;//for update_plus operations
 
     public:
     Inserter(T &refmatrix,int slot=5)
@@ -18,6 +18,7 @@ class Inserter
         slotsize=slot;
         matrix=&refmatrix;
         matrix->allocMem(slotsize);
+        isupdate=update;
     }
 
     void addEntry(int row,int col,int value)
@@ -76,6 +77,7 @@ class Inserter
 
     ~Inserter()
     {
+        //For adding the entries from spare back to slots
         map<pair<int,int>,int>::iterator itr;
         for(itr=spare.begin();itr!=spare.end();itr++)
         {
@@ -86,8 +88,8 @@ class Inserter
             matrix->r[itr->first.first].N=size;
         }
 
-
-        for(int i=0;i<2;i++)
+        //For removing the unused entries from slots
+        for(int i=0;i<matrix->row;i++)
         {
             int *indexPtrFirst=matrix->r[i].indexptr;
             int *indexPtrLast=indexPtrFirst+matrix->r[i].N;
