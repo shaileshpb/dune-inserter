@@ -13,7 +13,9 @@ class FVector
     int* indexiterator;
 
     FVector()
-    {}
+    {
+        this->N=0;
+    }
     FVector(T *_data,int *_indexptr,size_type _N):data(_data),indexptr(_indexptr),N(_N)
     {}
 
@@ -47,3 +49,4 @@ class FVector
         return this->N;
     }
 };
+

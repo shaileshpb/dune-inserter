@@ -17,8 +17,9 @@ class Inserter
     {
         slotsize=slot;
         matrix=&refmatrix;
-        matrix->allocMem(slotsize);
         isupdate=update;
+        matrix->allocMem(slotsize);
+
     }
 
     void addEntry(int row,int col,int value)
@@ -75,9 +76,21 @@ class Inserter
 
     }
 
+    /*void element_matrix(int *m2,vector<int> v1,vector<int> v2)
+    {
+        for(int i=0;i<v1.size();i++)
+        {
+            for(int j=0;j<v2.size();j++)
+            {
+                addEntry(m2[i][j],v1[i],v2[j]);
+            }
+        }
+
+    }*/
+
     ~Inserter()
     {
-        //For adding the entries from spare back to slots
+        //for inserting entries from spare into slots
         map<pair<int,int>,int>::iterator itr;
         for(itr=spare.begin();itr!=spare.end();itr++)
         {
@@ -88,7 +101,7 @@ class Inserter
             matrix->r[itr->first.first].N=size;
         }
 
-        //For removing the unused entries from slots
+        //Removing unused entries from column and value array
         for(int i=0;i<matrix->row;i++)
         {
             int *indexPtrFirst=matrix->r[i].indexptr;
@@ -107,3 +120,4 @@ class Inserter
 
     }
 };
+

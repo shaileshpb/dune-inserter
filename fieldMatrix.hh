@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <assert.h>
 #include "inserter.hh"
 #include "fieldVector.hh"
 template<class T,class Allocator=allocator<T> >
@@ -24,6 +25,20 @@ class FMatrix:public FVector<T,Allocator>
     {
         for(int i=0;i<row;i++)
         {
+            //deallocate the previous allocated memory if any
+            if(r[i].N!=0)
+            {
+                for(int j=0;j<r[i].N;j++)
+                    alloc.destroy(&r[i].indexptr[j]);
+                alloc.deallocate(r[i].indexptr,r[i].N);
+
+                for(int j=0;j<r[i].N;j++)
+                    alloc.destroy(&r[i].data[j]);
+                alloc.deallocate(r[i].data,r[i].N);
+
+            }
+
+            //Allocating memory as per the given slot size
             r[i].data=alloc.allocate(slot);
             r[i].indexptr=alloc.allocate(slot);
             uninitialized_fill_n(r[i].indexptr, slot,col);
@@ -51,11 +66,14 @@ class FMatrix:public FVector<T,Allocator>
         }
     }
 
+    //Matrices multiplication
     FMatrix operator*(FMatrix &mat1)
     {
 
-        FMatrix<int> res(col,mat1.row);
+        assert(col==mat1.row);
+        FMatrix<int> res(row,mat1.col);
         {
+            //here we will need the update_plus template parameter of inserter class
             Inserter<FMatrix<int>,true > ins(res,2);
             for(int i=0;i<row;i++)
             {
@@ -69,8 +87,6 @@ class FMatrix:public FVector<T,Allocator>
                     for(int k=0;k<mat1.r[*this->indexiterator].N;k++)
                     {
                         int value=(*(this->dataiterator))*(*mat1.dataiterator);
-                        //cout<<i<<" "<<*(mat1.indexiterator)<<" "<<value<<endl;
-                        //result[i][*(mat1.indexiterator)]+=value;
                         ins.addEntry(i,*(mat1.indexiterator),value);
                         mat1.indexiterator++;
                         mat1.dataiterator++;
@@ -84,3 +100,4 @@ class FMatrix:public FVector<T,Allocator>
         return res;
     }
 };
+
